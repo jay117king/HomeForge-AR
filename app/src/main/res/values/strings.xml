@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">HomeForge AR</string>
+    <string name="scan_room">Scan a Room</string>
+    <string name="finalize_room">Finalize Room</string>
+    <string name="measure">Measure</string>
+    <string name="lock">Lock</string>
+    <string name="unlock">Unlock</string>
+    <string name="search_hint">Search table, cupboard, tap…</string>
+    <string name="place_in_room">Place in Room</string>
+    <string name="ar_overlay">AR Overlay</string>
+    <string name="device_not_supported">This device does not fully support ARCore Depth. Basic measurement is still available.</string>
+</resources>
