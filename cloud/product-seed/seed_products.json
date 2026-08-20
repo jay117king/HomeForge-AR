@@ -1,0 +1,72 @@
+[
+  {
+    "id": "table_oak_180",
+    "name": "Solid Oak Dining Table 180cm",
+    "category": "table",
+    "lengthCm": 180,
+    "widthCm": 90,
+    "heightCm": 75,
+    "price": 599.00,
+    "sourceUrl": "https://example.com/oak-table-180",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1617806118233-18e1de247200?w=800"
+    ],
+    "brand": "Generic"
+  },
+  {
+    "id": "table_marble_120",
+    "name": "Marble Top Coffee Table",
+    "category": "table",
+    "lengthCm": 120,
+    "widthCm": 60,
+    "heightCm": 45,
+    "price": 349.00,
+    "sourceUrl": "https://example.com/marble-coffee",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1592078615290-033ee584e267?w=800"
+    ],
+    "brand": "Generic"
+  },
+  {
+    "id": "cupboard_white_90",
+    "name": "White Kitchen Cupboard 90cm",
+    "category": "cupboard",
+    "lengthCm": 90,
+    "widthCm": 60,
+    "heightCm": 210,
+    "price": 279.00,
+    "sourceUrl": "https://example.com/white-cupboard",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1556912173-46c336c7fd55?w=800"
+    ],
+    "brand": "Generic"
+  },
+  {
+    "id": "tap_chrome_mixer",
+    "name": "Chrome Kitchen Mixer Tap",
+    "category": "tap",
+    "lengthCm": 20,
+    "widthCm": 5,
+    "heightCm": 35,
+    "price": 89.00,
+    "sourceUrl": "https://example.com/chrome-mixer",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800"
+    ],
+    "brand": "Generic"
+  },
+  {
+    "id": "sofa_3seat_grey",
+    "name": "3-Seater Grey Fabric Sofa",
+    "category": "sofa",
+    "lengthCm": 220,
+    "widthCm": 95,
+    "heightCm": 85,
+    "price": 899.00,
+    "sourceUrl": "https://example.com/grey-sofa",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800"
+    ],
+    "brand": "Generic"
+  }
+]
