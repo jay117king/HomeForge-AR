@@ -5,7 +5,7 @@ Scan any room → high-fidelity interactive 3D twin → place real store product
 
 Built with free / near-zero-cost stack only.
 
-**Repository**: https://github.com/jay117king/HomeForge-AR
+**Live Repository**: https://github.com/jay117king/HomeForge-AR
 
 ## Core Features (Max MVP)
 
@@ -13,8 +13,8 @@ Built with free / near-zero-cost stack only.
 - Multi-plane reconstruction → editable polygonal 3D room mesh
 - High-fidelity 3D environment (Filament PBR, soft shadows, AO)
 - Live AR overlay of placed products
-- Product search + dimension filters (L×W×H)
-- Seed catalog of real furniture + user-pasted URL support (Schema.org parsing)
+- Product search + live dimension filters (L × W × H)
+- Seed catalog of real furniture + user-pasted URL support (Schema.org)
 - Free image-to-3D pipeline (TripoSR / InstantMesh on Hugging Face Spaces)
 - Photo billboard fallback for instant placement
 - Local Room DB + optional free-tier cloud backup
@@ -33,44 +33,44 @@ Built with free / near-zero-cost stack only.
 | Image-to-3D        | Hugging Face Spaces (TripoSR)   | Free ZeroGPU / CPU |
 | Product Data       | Seed DB + Schema.org parse      | No scraping |
 
-## Current Project Status (Day 1)
+## Current Status (Fully Scaffolded)
 
-✅ Repository created  
-✅ Full Gradle setup (Compose, ARCore, Filament, Room, Ktor, ML Kit)  
-✅ AndroidManifest with ARCore requirements  
-✅ MainActivity + camera/ARCore availability checks  
-✅ Material3 theme (dark/light + dynamic)  
-✅ Compose navigation skeleton (Home → Scan → Room View)  
-✅ ArSessionManager (depth + plane detection ready)  
-✅ FilamentRenderer skeleton  
-✅ Core data models (Project, Product, PlacedObject, RoomMesh)  
-✅ Initial product seed catalog (tables, cupboards, taps, sofa)  
+### Completed
+- ✅ Full Gradle project (Compose, ARCore 1.46, Filament 1.56, Room, Ktor, ML Kit, Coil)
+- ✅ AndroidManifest with ARCore + camera requirements
+- ✅ MainActivity with permission + ARCore availability handling
+- ✅ Material 3 theme (dark / light / dynamic)
+- ✅ Complete Compose navigation (Home → Scan → 3D Room)
+- ✅ ScanScreen with measure / lock / finalize controls
+- ✅ RoomViewScreen with live product search + RangeSliders for L/W filters + product cards
+- ✅ ArSessionManager (depth + horizontal/vertical planes)
+- ✅ TapeMeasure class with lock / unlock / formatted distance
+- ✅ FilamentRenderer skeleton
+- ✅ Room database + DAOs + ProductRepository with seed loading
+- ✅ Seed catalog (7 products) in assets + cloud folder
+- ✅ Image-to-3D free pipeline documentation
+- ✅ ProGuard rules, strings, themes, gitignore
 
-**Next immediate tasks**  
-1. Wire ArSessionManager into a real SurfaceView / AndroidView in ScanScreen  
-2. Implement basic plane visualization + tape measure UI  
-3. Flesh out Filament room mesh loading + orbit camera  
-4. Product search UI + dimension sliders  
+### Still to implement (next coding sessions)
+1. Real ARCore SurfaceView / GLSurfaceView inside ScanScreen + plane rendering
+2. Full Filament engine init, room mesh loading, orbit camera, product GLB instancing
+3. AR overlay mode (shared camera texture)
+4. Schema.org URL parser for user-pasted product links
+5. Hugging Face Space FastAPI wrapper + on-demand GLB download
+6. Project save / load + screenshot export
 
-## Setup Instructions
+## How to Run
 
-### Prerequisites
-- Android Studio Ladybug or newer
-- Android SDK 34+
-- Physical device with ARCore + Depth API (Pixel 6+, Samsung S21+, etc.)
-- JDK 17
-
-### Local Build
 ```bash
 git clone https://github.com/jay117king/HomeForge-AR.git
 cd HomeForge-AR
-# Open in Android Studio → Sync Gradle → Run on physical ARCore device
+# Open folder in Android Studio (Ladybug+)
+# Sync Gradle
+# Connect a physical ARCore Depth device (Pixel 6+, S21+, etc.)
+# Run
 ```
 
-### Free Cloud Setup (later)
-1. Create free Supabase project → copy URL + anon key into `local.properties`
-2. Deploy TripoSR wrapper to Hugging Face Spaces
-3. Pre-generate seed product GLBs on Colab free GPU and upload to Supabase Storage
+The UI already works end-to-end with simulated data. Real AR + 3D rendering is the next layer.
 
 ## License
 
