@@ -129,7 +129,6 @@ fun ScanScreen(onScanComplete: () -> Unit, onBack: () -> Unit) {
     var isLocked by remember { mutableStateOf(false) }
     var planeCount by remember { mutableIntStateOf(0) }
 
-    // Triggers sent to ArCameraView
     var measureTrigger by remember { mutableIntStateOf(0) }
     var lockTrigger by remember { mutableIntStateOf(0) }
     var resetTrigger by remember { mutableIntStateOf(0) }
@@ -153,18 +152,17 @@ fun ScanScreen(onScanComplete: () -> Unit, onBack: () -> Unit) {
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
 
-            // ── Real ARCore camera + plane visualization ──────────────────────
             ArCameraView(
                 modifier = Modifier.fillMaxSize(),
                 onPlaneCountChanged = { planeCount = it },
                 onDistanceChanged = { distanceText = it },
                 onLockedChanged = { isLocked = it },
-                measureRequested = measureTrigger > 0,
-                lockRequested = lockTrigger > 0,
-                resetMeasure = resetTrigger > 0
+                measureTrigger = measureTrigger,
+                lockTrigger = lockTrigger,
+                resetTrigger = resetTrigger
             )
 
-            // ── Top status chip ───────────────────────────────────────────────
+            // Status chip
             Surface(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
@@ -181,7 +179,7 @@ fun ScanScreen(onScanComplete: () -> Unit, onBack: () -> Unit) {
                 )
             }
 
-            // ── Bottom control panel ──────────────────────────────────────────
+            // Bottom controls
             Column(
                 Modifier
                     .align(Alignment.BottomCenter)
