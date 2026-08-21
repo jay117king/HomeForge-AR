@@ -23,9 +23,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.homeforge.ar.ar.ArCameraView
 import com.homeforge.ar.data.Product
 import com.homeforge.ar.data.ProductRepository
-import kotlinx.coroutines.launch
 
 @Composable
 fun HomeForgeApp() {
@@ -33,7 +33,6 @@ fun HomeForgeApp() {
     val context = LocalContext.current
     val repo = remember { ProductRepository(context) }
 
-    // Seed on first launch
     LaunchedEffect(Unit) {
         repo.ensureSeedData()
     }
@@ -130,6 +129,11 @@ fun ScanScreen(onScanComplete: () -> Unit, onBack: () -> Unit) {
     var isLocked by remember { mutableStateOf(false) }
     var planeCount by remember { mutableIntStateOf(0) }
 
+    // Triggers sent to ArCameraView
+    var measureTrigger by remember { mutableIntStateOf(0) }
+    var lockTrigger by remember { mutableIntStateOf(0) }
+    var resetTrigger by remember { mutableIntStateOf(0) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -138,32 +142,51 @@ fun ScanScreen(onScanComplete: () -> Unit, onBack: () -> Unit) {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, "Back")
                     }
+                },
+                actions = {
+                    IconButton(onClick = { resetTrigger++ }) {
+                        Icon(Icons.Default.Refresh, "Reset measure")
+                    }
                 }
             )
         }
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
-            // AR camera surface will be placed here later via AndroidView
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                contentAlignment = Alignment.Center
+
+            // ── Real ARCore camera + plane visualization ──────────────────────
+            ArCameraView(
+                modifier = Modifier.fillMaxSize(),
+                onPlaneCountChanged = { planeCount = it },
+                onDistanceChanged = { distanceText = it },
+                onLockedChanged = { isLocked = it },
+                measureRequested = measureTrigger > 0,
+                lockRequested = lockTrigger > 0,
+                resetMeasure = resetTrigger > 0
+            )
+
+            // ── Top status chip ───────────────────────────────────────────────
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 12.dp),
+                shape = RoundedCornerShape(20.dp),
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+                tonalElevation = 4.dp
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Default.ViewInAr, null, Modifier.size(64.dp))
-                    Spacer(Modifier.height(12.dp))
-                    Text("ARCore camera view", style = MaterialTheme.typography.titleMedium)
-                    Text("Walk around to detect floor & walls", style = MaterialTheme.typography.bodyMedium)
-                }
+                Text(
+                    text = if (planeCount == 0) "Move phone to detect surfaces"
+                           else "$planeCount plane${if (planeCount == 1) "" else "s"} detected",
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    style = MaterialTheme.typography.labelLarge
+                )
             }
 
-            // Overlay controls
+            // ── Bottom control panel ──────────────────────────────────────────
             Column(
                 Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.92f))
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.94f))
                     .padding(16.dp)
             ) {
                 Row(
@@ -176,32 +199,42 @@ fun ScanScreen(onScanComplete: () -> Unit, onBack: () -> Unit) {
                         Text(
                             distanceText,
                             style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = if (isLocked) MaterialTheme.colorScheme.tertiary
+                                    else MaterialTheme.colorScheme.onSurface
                         )
                     }
-                    Text("Planes: $planeCount", style = MaterialTheme.typography.bodyMedium)
+                    AssistChip(
+                        onClick = {},
+                        label = { Text("$planeCount planes") },
+                        leadingIcon = {
+                            Icon(Icons.Default.Layers, null, Modifier.size(16.dp))
+                        }
+                    )
                 }
 
                 Spacer(Modifier.height(12.dp))
 
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     OutlinedButton(
-                        onClick = {
-                            // Simulate measure for now
-                            distanceText = if (isLocked) distanceText else "124.5 cm"
-                        },
+                        onClick = { measureTrigger++ },
                         modifier = Modifier.weight(1f)
                     ) {
                         Icon(Icons.Default.Straighten, null, Modifier.size(18.dp))
                         Spacer(Modifier.width(4.dp))
                         Text("Measure")
                     }
+
                     Button(
-                        onClick = { isLocked = !isLocked },
+                        onClick = { lockTrigger++ },
                         modifier = Modifier.weight(1f),
-                        colors = if (isLocked) ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.tertiary
-                        ) else ButtonDefaults.buttonColors()
+                        colors = if (isLocked)
+                            ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary)
+                        else
+                            ButtonDefaults.buttonColors()
                     ) {
                         Icon(
                             if (isLocked) Icons.Default.Lock else Icons.Default.LockOpen,
@@ -217,12 +250,20 @@ fun ScanScreen(onScanComplete: () -> Unit, onBack: () -> Unit) {
 
                 Button(
                     onClick = onScanComplete,
-                    modifier = Modifier.fillMaxWidth().height(48.dp)
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    enabled = planeCount > 0
                 ) {
                     Icon(Icons.Default.Check, null)
                     Spacer(Modifier.width(8.dp))
                     Text("Finalize Room")
                 }
+
+                Text(
+                    "Tip: Tap the screen or press Measure to set points. Lock when happy.",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    modifier = Modifier.padding(top = 8.dp)
+                )
             }
         }
     }
@@ -239,7 +280,6 @@ fun RoomViewScreen(repo: ProductRepository, onBack: () -> Unit) {
     var products by remember { mutableStateOf<List<Product>>(emptyList()) }
     var selectedProduct by remember { mutableStateOf<Product?>(null) }
     var showSidebar by remember { mutableStateOf(true) }
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(searchQuery, minL, maxL, minW, maxW) {
         products = repo.search(
@@ -272,7 +312,6 @@ fun RoomViewScreen(repo: ProductRepository, onBack: () -> Unit) {
         }
     ) { padding ->
         Row(Modifier.fillMaxSize().padding(padding)) {
-            // 3D / AR view area
             Box(
                 Modifier
                     .weight(if (showSidebar) 0.55f else 1f)
@@ -296,7 +335,6 @@ fun RoomViewScreen(repo: ProductRepository, onBack: () -> Unit) {
                 }
             }
 
-            // Product sidebar
             if (showSidebar) {
                 Column(
                     Modifier
@@ -309,7 +347,7 @@ fun RoomViewScreen(repo: ProductRepository, onBack: () -> Unit) {
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Search table, cupboard…") },
+                        placeholder = { Text("Search table, cupboard\u2026") },
                         leadingIcon = { Icon(Icons.Default.Search, null) },
                         singleLine = true
                     )
@@ -332,10 +370,7 @@ fun RoomViewScreen(repo: ProductRepository, onBack: () -> Unit) {
                     )
 
                     Spacer(Modifier.height(8.dp))
-                    Text(
-                        "${products.size} products",
-                        style = MaterialTheme.typography.labelMedium
-                    )
+                    Text("${products.size} products", style = MaterialTheme.typography.labelMedium)
                     Spacer(Modifier.height(4.dp))
 
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -386,12 +421,12 @@ fun ProductCard(product: Product, isSelected: Boolean, onClick: () -> Unit) {
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    "${product.lengthCm.toInt()} × ${product.widthCm.toInt()} × ${product.heightCm.toInt()} cm",
+                    "${product.lengthCm.toInt()} \u00d7 ${product.widthCm.toInt()} \u00d7 ${product.heightCm.toInt()} cm",
                     style = MaterialTheme.typography.labelSmall
                 )
                 product.price?.let {
                     Text(
-                        "$${"%.0f".format(it)}",
+                        "$${\"%.0f\".format(it)}",
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
