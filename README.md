@@ -1,69 +1,74 @@
 # HomeForge AR
 
 **Premium Android AR Home Remodeling App**  
-Scan any room → high-fidelity interactive 3D twin → place real store products as accurate to-scale 3D models (live AR overlay supported).
+Scan any room → place real products → view in interactive room plan → save projects.
 
-Built with free / near-zero-cost stack only.
+**Repository**: https://github.com/jay117king/HomeForge-AR
 
-**Live Repository**: https://github.com/jay117king/HomeForge-AR
+## What works right now (complete core loop)
 
-## Core Features (Max MVP)
+1. **AR Scan** – live ARCore camera, plane detection (floor = blue grids, walls = orange), tape measure (tap or button), Lock / Unlock / Reset
+2. **Finalize Room** – stores measured dimensions into `ScanResult`
+3. **3D Room View** – interactive top-down room plan (pinch zoom, drag pan), shows real dimensions
+4. **Product catalog** – search + length/width filters, seed products with photos & prices
+5. **Place products** – tap a product to add/remove it in the room
+6. **Save Project** – persists room + placed items to local Room database
+7. **My Projects** – list, open, delete saved projects
 
-- **ARCore + Depth API** room scanning with visual tape measure & lock
-- Multi-plane reconstruction → editable polygonal 3D room mesh
-- High-fidelity 3D environment (Filament PBR, soft shadows, AO)
-- Live AR overlay of placed products
-- Product search + live dimension filters (L × W × H)
-- Seed catalog of real furniture + user-pasted URL support (Schema.org)
-- Free image-to-3D pipeline (TripoSR / InstantMesh on Hugging Face Spaces)
-- Photo billboard fallback for instant placement
-- Local Room DB + optional free-tier cloud backup
+## How to get the APK
 
-## Current Status
+### Requirements
+- Android Studio Ladybug or newer
+- JDK 17
+- Physical phone with **ARCore + Depth API** (Pixel 6+, Samsung S21+, etc.)
 
-### Working now
-- ✅ Full project + Gradle (Compose, ARCore, Filament, Room, Ktor, ML Kit, Coil)
-- ✅ **Real ARCore camera feed** via GLSurfaceView + AndroidView
-- ✅ **Plane detection & visualization** (blue grids = floor, orange = walls)
-- ✅ **Live tape measure** – tap screen or press Measure, Lock / Unlock, Reset
-- ✅ Plane count indicator + status chip
-- ✅ Product search UI with dimension RangeSliders + product cards
-- ✅ Room database + seed catalog (7 items)
-- ✅ Material 3 theme, navigation, permissions handling
-
-### Next up
-1. Capture finalized room mesh from detected planes
-2. Filament 3D room view + orbit camera
-3. Product GLB / billboard placement in the 3D room
-4. AR overlay mode (products in live camera)
-5. Schema.org URL paste + image-to-3D pipeline
-
-## How to Run
-
+### Steps
 ```bash
 git clone https://github.com/jay117king/HomeForge-AR.git
+cd HomeForge-AR
 ```
 
-1. Open in **Android Studio** (Ladybug or newer)
-2. Sync Gradle
-3. Connect a physical device with **ARCore + Depth API** support  
-   (Pixel 6+, Samsung Galaxy S21+, etc.)
-4. Run the app
-5. Grant camera permission → tap **Scan a Room**
-6. Move the phone slowly to detect floor & walls (colored grids appear)
-7. Tap the screen or press **Measure** to set points → **Lock** when happy
-8. Press **Finalize Room** when you have good coverage
+1. Open the folder in Android Studio.
+2. Wait for Gradle sync to finish.
+3. Connect your ARCore phone via USB (enable USB debugging).
+4. Click the green **Run** button – this installs a debug APK on the device.
 
-## Tech Highlights
+**To produce a shareable APK file:**
+- Menu → **Build → Build Bundle(s) / APK(s) → Build APK(s)**
+- When finished click **locate**
+- APK path: `app/build/outputs/apk/debug/app-debug.apk`
 
-| Component        | Implementation                                      |
-|------------------|-----------------------------------------------------|
-| AR Session       | `ArSessionManager` + Depth + Horizontal/Vertical    |
-| Camera + Planes  | Custom `GLSurfaceView` renderer (Background + Grid) |
-| Measure          | `TapeMeasure` with hit-test on Plane / DepthPoint   |
-| UI               | Jetpack Compose + Material 3                        |
-| 3D Engine        | Filament (ready for next stage)                     |
-| Data             | Room + seed JSON + ProductRepository                |
+**Release APK (optional):**
+- Create a keystore (Build → Generate Signed Bundle / APK)
+- Select release build type
+- Output: `app/build/outputs/apk/release/app-release.apk`
+
+## App flow
+
+1. Open app → **Scan a Room**
+2. Grant camera permission
+3. Move phone slowly – colored grids appear on surfaces
+4. Tap screen or press **Measure** to set two points → distance appears
+5. Press **Lock** when satisfied
+6. Press **Finalize Room**
+7. In the room view: search products, adjust dimension filters, tap products to place them
+8. Press the **Save** icon → name the project
+9. From Home → **My Projects** to see saved rooms
+
+## Tech stack
+
+- Kotlin + Jetpack Compose + Material 3
+- ARCore 1.46 (Depth + planes)
+- Custom OpenGL ES plane renderer
+- Room (SQLite) for projects & products
+- Coil for product images
+- Filament included for future full 3D / GLB support
+
+## Notes
+
+- Emulators **cannot** run ARCore Depth – use a real device.
+- First launch seeds 7 sample products automatically.
+- Filament full PBR materials require `.filamat` assets (skeleton is present; production 3D can be added later without changing the rest of the app).
 
 ## License
 
