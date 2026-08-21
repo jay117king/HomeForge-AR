@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21"
 }
 
 android {
@@ -10,14 +11,13 @@ android {
 
     defaultConfig {
         applicationId = "com.homeforge.ar"
-        minSdk = 29          // Android 10+ for solid ARCore Depth support
+        minSdk = 29
         targetSdk = 35
         versionCode = 1
         versionName = "0.1.0-mvp"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // ARCore requires this
         ndk {
             abiFilters += listOf("armeabi-v7a", "arm64-v8a")
         }
@@ -25,7 +25,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -62,7 +62,6 @@ android {
 }
 
 dependencies {
-    // Core Android + Compose
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
     implementation("androidx.activity:activity-compose:1.9.3")
@@ -74,34 +73,26 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.navigation:navigation-compose:2.8.3")
 
-    // ARCore
     implementation("com.google.ar:core:1.46.0")
 
-    // Filament (Google 3D engine)
     implementation("com.google.android.filament:filament-android:1.56.0")
     implementation("com.google.android.filament:filament-utils-android:1.56.0")
     implementation("com.google.android.filament:gltfio-android:1.56.0")
 
-    // Room
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
 
-    // Networking
     implementation("io.ktor:ktor-client-android:3.0.1")
     implementation("io.ktor:ktor-client-content-negotiation:3.0.1")
     implementation("io.ktor:ktor-serialization-kotlinx-json:3.0.1")
 
-    // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
-    // ML Kit Object Detection (on-device, free)
     implementation("com.google.mlkit:object-detection:17.0.1")
-
-    // Image loading
     implementation("io.coil-kt:coil-compose:2.7.0")
 
-    // Debug
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
