@@ -19,58 +19,51 @@ Built with free / near-zero-cost stack only.
 - Photo billboard fallback for instant placement
 - Local Room DB + optional free-tier cloud backup
 
-## Tech Stack
+## Current Status
 
-| Layer              | Choice                          | Why |
-|--------------------|---------------------------------|-----|
-| Language           | Kotlin 100%                     | Modern, coroutines, ARCore first-class |
-| UI                 | Jetpack Compose                 | Declarative, 60fps, dark/light easy |
-| AR                 | ARCore + Depth API              | Plane + depth, occlusion |
-| 3D Engine          | Filament (Google)               | PBR, native Android, Apache 2.0, small |
-| Local DB           | Room (SQLite)                   | Projects, product cache |
-| Networking         | Ktor Client                     | Lightweight |
-| Cloud              | Supabase free tier              | Auth, Postgres, Storage |
-| Image-to-3D        | Hugging Face Spaces (TripoSR)   | Free ZeroGPU / CPU |
-| Product Data       | Seed DB + Schema.org parse      | No scraping |
+### Working now
+- ✅ Full project + Gradle (Compose, ARCore, Filament, Room, Ktor, ML Kit, Coil)
+- ✅ **Real ARCore camera feed** via GLSurfaceView + AndroidView
+- ✅ **Plane detection & visualization** (blue grids = floor, orange = walls)
+- ✅ **Live tape measure** – tap screen or press Measure, Lock / Unlock, Reset
+- ✅ Plane count indicator + status chip
+- ✅ Product search UI with dimension RangeSliders + product cards
+- ✅ Room database + seed catalog (7 items)
+- ✅ Material 3 theme, navigation, permissions handling
 
-## Current Status (Fully Scaffolded)
-
-### Completed
-- ✅ Full Gradle project (Compose, ARCore 1.46, Filament 1.56, Room, Ktor, ML Kit, Coil)
-- ✅ AndroidManifest with ARCore + camera requirements
-- ✅ MainActivity with permission + ARCore availability handling
-- ✅ Material 3 theme (dark / light / dynamic)
-- ✅ Complete Compose navigation (Home → Scan → 3D Room)
-- ✅ ScanScreen with measure / lock / finalize controls
-- ✅ RoomViewScreen with live product search + RangeSliders for L/W filters + product cards
-- ✅ ArSessionManager (depth + horizontal/vertical planes)
-- ✅ TapeMeasure class with lock / unlock / formatted distance
-- ✅ FilamentRenderer skeleton
-- ✅ Room database + DAOs + ProductRepository with seed loading
-- ✅ Seed catalog (7 products) in assets + cloud folder
-- ✅ Image-to-3D free pipeline documentation
-- ✅ ProGuard rules, strings, themes, gitignore
-
-### Still to implement (next coding sessions)
-1. Real ARCore SurfaceView / GLSurfaceView inside ScanScreen + plane rendering
-2. Full Filament engine init, room mesh loading, orbit camera, product GLB instancing
-3. AR overlay mode (shared camera texture)
-4. Schema.org URL parser for user-pasted product links
-5. Hugging Face Space FastAPI wrapper + on-demand GLB download
-6. Project save / load + screenshot export
+### Next up
+1. Capture finalized room mesh from detected planes
+2. Filament 3D room view + orbit camera
+3. Product GLB / billboard placement in the 3D room
+4. AR overlay mode (products in live camera)
+5. Schema.org URL paste + image-to-3D pipeline
 
 ## How to Run
 
 ```bash
 git clone https://github.com/jay117king/HomeForge-AR.git
-cd HomeForge-AR
-# Open folder in Android Studio (Ladybug+)
-# Sync Gradle
-# Connect a physical ARCore Depth device (Pixel 6+, S21+, etc.)
-# Run
 ```
 
-The UI already works end-to-end with simulated data. Real AR + 3D rendering is the next layer.
+1. Open in **Android Studio** (Ladybug or newer)
+2. Sync Gradle
+3. Connect a physical device with **ARCore + Depth API** support  
+   (Pixel 6+, Samsung Galaxy S21+, etc.)
+4. Run the app
+5. Grant camera permission → tap **Scan a Room**
+6. Move the phone slowly to detect floor & walls (colored grids appear)
+7. Tap the screen or press **Measure** to set points → **Lock** when happy
+8. Press **Finalize Room** when you have good coverage
+
+## Tech Highlights
+
+| Component        | Implementation                                      |
+|------------------|-----------------------------------------------------|
+| AR Session       | `ArSessionManager` + Depth + Horizontal/Vertical    |
+| Camera + Planes  | Custom `GLSurfaceView` renderer (Background + Grid) |
+| Measure          | `TapeMeasure` with hit-test on Plane / DepthPoint   |
+| UI               | Jetpack Compose + Material 3                        |
+| 3D Engine        | Filament (ready for next stage)                     |
+| Data             | Room + seed JSON + ProductRepository                |
 
 ## License
 
