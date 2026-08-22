@@ -22,12 +22,25 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: google-github-actions/setup-android@v2
-        with:
-          api-levels: '35'
-          build-tools: '35.0.0'
-          components: 'platform-tools'
+      - name: Install Android SDK command-line tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip wget
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          cd $HOME/android-sdk
+          # download command-line tools (versioned binary). If this URL breaks in the future, update to a valid commandline-tools zip
+          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline.zip
+          unzip -q cmdline.zip -d cmdline-tools
+          mkdir -p cmdline-tools/latest
+          mv cmdline-tools/cmdline-tools/* cmdline-tools/latest/
+          export ANDROID_SDK_ROOT=$HOME/android-sdk
+          export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Add Android SDK to PATH
+        run: |
+          echo "$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
+          echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
 
       - name: Cache Gradle
         uses: actions/cache@v4
@@ -38,7 +51,7 @@ jobs:
           key: gradle-cache-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
 
       - name: Grant execute for Gradlew
-        run: chmod +x ./gradlew
+        run: chmod +x ./gradlew || true
 
       - name: Build (assembleDebug)
         run: ./gradlew assembleDebug --no-daemon --stacktrace
